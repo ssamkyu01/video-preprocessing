@@ -6,9 +6,8 @@ COPY . .
 
 
 RUN apt-get update && apt-get install -y git 
-RUN apt install -y libpython3.9-dev
 
-RUN python3 -m pip install --upgrade pip setuptools wheel
+RUN python3 -m pip install --upgrade pip setuptools wheel && pip install --no-binary :all: pandas
 RUN git clone https://github.com/ssamkyu01/video-preprocessing.git && pip install --use-pep517 -r $(pwd)/requirements.txt
 
 
