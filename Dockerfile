@@ -4,6 +4,6 @@ WORKDIR /app
 COPY . .
 
 RUN python3 -m pip install --upgrade pip
-RUN apt-get update && apt-get install -y git && git clone https://github.com/AliaksandrSiarohin/video-preprocessing.git && pip install -r $(pwd)/requirements.txt
+RUN apt-get update && apt-get install -y git && git clone https://github.com/ssamkyu01/video-preprocessing.git && pip install -r $(pwd)/requirements.txt
 
 
