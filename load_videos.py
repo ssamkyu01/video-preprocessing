@@ -17,20 +17,26 @@ warnings.filterwarnings("ignore")
 
 DEVNULL = open(os.devnull, 'wb')
 
+
 def download(video_id, args):
-    video_path = os.path.join(args.video_folder, video_id + ".mp4")
-    subprocess.call([args.youtube, '-f', "''best/mp4''", '--write-auto-sub', '--write-sub',
-                     '--sub-lang', 'en', '--skip-unavailable-fragments',
-                     "https://www.youtube.com/watch?v=" + video_id, "--output",
-                     video_path], stdout=DEVNULL, stderr=DEVNULL)
+    
+    video_path = os.path.join(args.video_folder)
+    filename = video_id + ".mp4"
+    subprocess.call(['yt-dlp', '-P', video_path, '-o', '%(id)s.%(ext)s'  ,  'URL', "https://www.youtube.com/watch?v=" + video_id ], stdout=DEVNULL, stderr=DEVNULL)
+    
     return video_path
 
 
+
 def run(data):
+        
     video_id, args = data
+    
+    
     if not os.path.exists(os.path.join(args.video_folder, video_id.split('#')[0] + '.mp4')):
        download(video_id.split('#')[0], args)
 
+    
     if not os.path.exists(os.path.join(args.video_folder, video_id.split('#')[0] + '.mp4')):
        print ('Can not load video %s, broken link' % video_id.split('#')[0])
        return 
@@ -73,13 +79,14 @@ def run(data):
 
 
 if __name__ == "__main__":
+    
     parser = ArgumentParser()
     parser.add_argument("--video_folder", default='youtube-taichi', help='Path to youtube videos')
-    parser.add_argument("--metadata", default='taichi-metadata-new.csv', help='Path to metadata')
+    parser.add_argument("--metadata", default='taichi-metadata.csv', help='Path to metadata')
     parser.add_argument("--out_folder", default='taichi-png', help='Path to output')
     parser.add_argument("--format", default='.png', help='Storing format')
     parser.add_argument("--workers", default=1, type=int, help='Number of workers')
-    parser.add_argument("--youtube", default='./youtube-dl', help='Path to youtube-dl')
+    #parser.add_argument("--youtube", default='./youtube-dl', help='Path to youtube-dl')
  
     parser.add_argument("--image_shape", default=(256, 256), type=lambda x: tuple(map(int, x.split(','))),
                         help="Image shape, None for no resize")
@@ -96,6 +103,9 @@ if __name__ == "__main__":
     df = pd.read_csv(args.metadata)
     video_ids = set(df['video_id'])
     pool = Pool(processes=args.workers)
+    print(pool)
     args_list = cycle([args])
+    print(args_list)
+    
     for chunks_data in tqdm(pool.imap_unordered(run, zip(video_ids, args_list))):
         None  
