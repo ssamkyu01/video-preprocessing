@@ -104,9 +104,17 @@ def scheduler(data_list, fn, args):
     device_ids = args.device_ids.split(",")
     pool = Pool(processes=args.workers)
     args_list = cycle([args])
+    
+    #vox-metadata.csv 파일 열어보기 chunks_metadata
     f = open(args.chunks_metadata, 'w')
     line = "{video_id},{start},{end},{bbox},{fps},{width},{height},{partition}"
     print (line.replace('{', '').replace('}', ''), file=f)
+    #zip 은 함수안에 들어가는 요소들을 병렬로 합치는 함수 [1,2,3] [4,5,6] [7,8,9] --> (1,4,7) (2,5,8) (3,6,9)로 변환하는 함수 
+    #zip 안에 data_list 는 crop_vox에서 생성한 id의 교집합 리스트 
+    #cycle(device_ids)는 만약 입력된 device가 [0,1,2,3,4,5] 이렇게 있다면 0, 1, 2,3,4,5, 0, 1,2,3,4,5,0....의 순서를 이번 device_ids의 길이만큼 계속 돌아가면서 입력되도록 하는 넣어줌
+    #args_list 역시도 args를 각각 device_ids가 돌아갈 때마다 배치됨. 
+    #pool.imap_unordered는 첫번째 인자로 함수, 두번째 인자로 함수에 들어가는 변수로 구성되며, 각각을 지정된 work수에 맞춰서 프로세스를 만들어 거기에 입력함. 즉 프로세스 X GPU의 숫자로 이번 학습이 진행되게 됨
+    #참고로 tqdm은 진행상황을 보여주는 함수 
     for chunks_data in tqdm(pool.imap_unordered(fn, zip(data_list, cycle(device_ids), args_list))):
         for data in chunks_data:
             print (line.format(**data), file=f)

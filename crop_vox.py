@@ -169,7 +169,9 @@ def split_in_utterance(person_id, video_id, args):
 def run(params):
     person_id, device_id, args = params
     os.environ['CUDA_VISIBLE_DEVICES'] = device_id
-    # update the config options with the config file
+    
+    #update the config options with the config file
+
     if args.estimate_bbox:
         import face_alignment
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
@@ -179,11 +181,16 @@ def run(params):
     for video_id in os.listdir(video_folder):
         intermediate_files = []
         try:
+            #args.download는 default값으로 True 
             if args.download:
+                #youtube에서 video_id 값으로 파일을 받아 옴
                 video_path = download(video_id, args)
+                #저장된 video path를 intermediate_files array에 넣어서 기록함. 
                 intermediate_files.append(video_path)
 
+            #args.split_in_utterance는 default값으로 True 
             if args.split_in_utterance:
+                
                 chunk_names = split_in_utterance(person_id, video_id, args)
                 intermediate_files += chunk_names
 
@@ -295,7 +302,9 @@ if __name__ == "__main__":
         if not os.path.exists(os.path.join(args.out_folder, partition)):
             os.makedirs(os.path.join(args.out_folder, partition))
 
+    #txt 
     ids = set(os.listdir(args.annotations_folder))
     ids_range = {'id' + str(num).zfill(5) for num in range(args.data_range[0], args.data_range[1])}
     ids = sorted(list(ids.intersection(ids_range)))
+    
     scheduler(ids, run, args)
