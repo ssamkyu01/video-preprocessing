@@ -42,7 +42,9 @@ RUN pip install certifi \
     && pip install torchvision \
     && pip install tqdm \
     && pip install urllib3 \
-    && pip install yt-dlp
+    && pip install yt-dlp \
+    && pip install face-alignment \
+    && pip install fastapi
 
 
 RUN git clone https://github.com/ssamkyu01/video-preprocessing.git 
